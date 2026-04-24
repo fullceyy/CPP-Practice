@@ -30,6 +30,18 @@ private:
         mCount = nullptr;
     }
 public:
+
+    bool operator==(const SharedPointer<T>& other)
+    {
+        return mUnderlyingPtr == other.mUnderlyingPtr; 
+    }
+
+    const U& operator[](int idx) requires std::is_array_v<T>
+    {
+        // if constexpr(std::is_array_v<T>)
+            return mUnderlyingPtr[idx];
+    }
+
     void cleanup()
     {
         mDeleter(mUnderlyingPtr);
@@ -164,4 +176,10 @@ SharedPointer<T> MakeSharedArray(std::size_t size)
     U* data = new U[size]();
 
     return SharedPointer<T>(data);
+}
+
+template <typename T>
+void swap(SharedPointer<T>& first, SharedPointer<T>& second) noexcept
+{
+    std::swap(first, second);    
 }
