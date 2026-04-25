@@ -16,6 +16,61 @@ struct CustomSimpleDeleter
 };
 
 template <typename T, typename D = CustomSimpleDeleter<T>>
+class ControlBlock
+{
+public:
+    using U = std::remove_extent_t<T>;
+    D mControlBlockDeleter;
+    U* mControlBlockRawPtr {nullptr};
+    uint32_t* mStrongCount {nullptr};
+    uint32_t* mWeakCount   {nullptr};
+
+    ControlBlock() {}
+    ~ControlBlock() {}
+};
+
+template <typename T, typename D = CustomSimpleDeleter<T>>
+class SharedSmartPointer
+{
+private:
+    /*
+        if passed float[] for example, it is not gonna strip away at it.
+        it passes it to the control block which in return handles the stripping process.
+        std::remove_extent_t I've meant.
+
+        Maybe then we can actually hold two types of the data.
+        Control Block makes sure to hold the right stripped away data so the pointer is set correctly.
+        Shared Smart Pointer holds the actual type of data without it being stripped away, 
+        maybe there is something to it.
+    */
+    ControlBlock<T, D>* mBlock {nullptr};
+public:
+    SharedSmartPointer() : mBlock(new ControlBlock<T, D>()) {}
+    ~SharedSmartPointer() {}
+
+    U* get() const noexcept
+    {
+        return static_cast<U*>(mBlock->mControlBlockRawPtr);
+    }
+    
+    U* operator->() const noexcept
+    {
+        return get();
+    }
+
+    U* operator*() const noexcept
+    {
+        return *get();
+    }
+
+    SharedSmartPointer(T* ptr)
+    {
+        
+    }
+};
+
+// does not support 2D arrays
+template <typename T, typename D = CustomSimpleDeleter<T>>
 class SharedPointer
 {
 private:

@@ -35,7 +35,7 @@ int main(void)
 
     SharedPointer<float[]> floatArr = MakeSharedArray<float[]>(64);
     std::cout << floatArr[55] << std::endl; 
-    // o in normal mode to go line below and enter insert mode.
+    // o in normal mode to go line below and eter insert mode.
     SharedPointer<float> floatTest = MakeShared<float>(11.2f);
     // std::cout << floatTest[1] << std::endl;
     // swap test
